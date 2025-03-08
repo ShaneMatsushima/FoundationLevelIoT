@@ -2,7 +2,8 @@ import blynklib
 import time
 import os
 import glob
-import spidev
+import Adafruit_ADS1x15
+
  
 os.system('modprobe w1-gpio')
 os.system('modprobe w1-therm')
@@ -20,12 +21,31 @@ BLYNK_AUTH = "1HsbA7vb5uJ-u1WyQOVQDzr7szErpMcK"
 blynk = blynklib.Blynk(BLYNK_AUTH)
 
 TEMPERATURE_PIN = 4  # GPIO pin connected to the DHT11 sensor
-MOISTURE_PIN = 2
+# Create an ADS1115 instance
+adc = Adafruit_ADS1x15.ADS1115(busnum=1)
+
+# Set the gain (adjust based on your sensor's output voltage range)
+# GAIN = 1 for ±4.096V, GAIN = 2 for ±2.048V, GAIN = 4 for ±1.024V, etc.
+GAIN = 1
+
+# Define the analog input channel (A0, A1, A2, or A3)
+CHANNEL = 0  # A0
+
+# Conversion factor (if needed to convert raw ADC value to meaningful units)
+# For example, if the sensor outputs 0-5V and GAIN = 1, the ADC range is ±4.096V.
+# You may need to scale the raw value accordingly.
+CONVERSION_FACTOR = 4.096 / 32767  # 16-bit signed value (±32767)
+
+# Sensor calibration parameters (adjust based on your sensor's datasheet)
+VOLTAGE_DRY = 1.0  # Voltage output for dry soil
+VOLTAGE_WET = 3.0  # Voltage output for wet soil
+VWC_DRY = 0.0      # VWC for dry soil (0%)
+VWC_WET = 1.0      # VWC for wet soil (100%)
+
 # Function to read sensor data
-#TODO incorporate moisture, currently giving C and F in temperature
 def read_sensor_data():
     temperature = read_temp()
-    moisture = analog_to_moisture(read_analog(MOISTURE_PIN))
+    moisture = convert_to_voltage(convert_to_voltage(read_sensor()))
     if moisture is not None and temperature is not None:
         return temperature, moisture
     else:
@@ -50,29 +70,26 @@ def read_temp():
         temp_f = temp_c * 9.0 / 5.0 + 32.0
         return temp_f
 
-# Initialize SPI
-spi = spidev.SpiDev()
-spi.open(0, 0)  # SPI bus 0, device 0 (CE0)
-spi.max_speed_hz = 1350000  # Set SPI speed
+def read_sensor():
+    """Read the raw ADC value from the specified channel."""
+    raw_value = adc.read_adc(CHANNEL, gain=GAIN)
+    return raw_value
 
-# Function to read analog data from MCP3008
-def read_analog(channel):
-    if channel < 0 or channel > 7:
-        raise ValueError("Channel must be between 0 and 7")
-    
-    # MCP3008 communication protocol
-    adc = spi.xfer2([1, (8 + channel) << 4, 0])
-    data = ((adc[1] & 3) << 8) + adc[2]
-    return data
+def convert_to_voltage(raw_value):
+    """Convert the raw ADC value to voltage."""
+    voltage = raw_value * CONVERSION_FACTOR
+    return voltage
 
-# Function to convert analog value to moisture percentage
-def analog_to_moisture(analog_value):
-    # ME110 typically outputs higher values for dry soil and lower values for wet soil
-    # Adjust these values based on your sensor's calibration
-    dry_value = 1023  # Value when sensor is in dry air
-    wet_value = 0     # Value when sensor is in water
-    moisture_percent = 100 - ((analog_value - wet_value) / (dry_value - wet_value)) * 100
-    return moisture_percent
+def convert_to_vwc(voltage):
+    """Convert voltage to Volumetric Water Content (VWC)."""
+    # Linear interpolation to calculate VWC
+    if voltage <= VOLTAGE_DRY:
+        return VWC_DRY
+    elif voltage >= VOLTAGE_WET:
+        return VWC_WET
+    else:
+        vwc = ((voltage - VOLTAGE_DRY) / (VOLTAGE_WET - VOLTAGE_DRY)) * (VWC_WET - VWC_DRY) + VWC_DRY
+        return vwc
 
 # Main loop
 while True:
@@ -81,6 +98,8 @@ while True:
 
     # Read sensor data
     temperature, moisture = read_sensor_data()
+    print(f"Temperature{temperature} \t Moisture{moisture}")
+
 
     if temperature is not None and moisture is not None:
         # Send temperature to virtual pin V1
