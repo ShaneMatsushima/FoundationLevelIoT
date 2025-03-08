@@ -1,0 +1,2 @@
+blynklib==0.2.6
+spidev==3.6.0
