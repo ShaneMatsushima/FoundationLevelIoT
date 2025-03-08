@@ -1,2 +1,5 @@
 blynklib==0.2.6
 spidev==3.6.0
+Adafruit-PureIO==1.1.11
+Adafruit_ADS1x15==1.0.2
+Adafruit_GPIO==1.0.3
