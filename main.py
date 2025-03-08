@@ -20,12 +20,12 @@ BLYNK_AUTH = "1HsbA7vb5uJ-u1WyQOVQDzr7szErpMcK"
 blynk = blynklib.Blynk(BLYNK_AUTH)
 
 TEMPERATURE_PIN = 4  # GPIO pin connected to the DHT11 sensor
-
+MOISTURE_PIN = 2
 # Function to read sensor data
 #TODO incorporate moisture, currently giving C and F in temperature
 def read_sensor_data():
     temperature = read_temp()
-    moisture = read_moisture()
+    moisture = analog_to_moisture(read_analog(MOISTURE_PIN))
     if moisture is not None and temperature is not None:
         return temperature, moisture
     else:
