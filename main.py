@@ -2,6 +2,7 @@ import blynklib
 import time
 import os
 import glob
+import spidev
  
 os.system('modprobe w1-gpio')
 os.system('modprobe w1-therm')
@@ -23,9 +24,10 @@ TEMPERATURE_PIN = 4  # GPIO pin connected to the DHT11 sensor
 # Function to read sensor data
 #TODO incorporate moisture, currently giving C and F in temperature
 def read_sensor_data():
-    humidity, temperature = read_temp()
-    if humidity is not None and temperature is not None:
-        return temperature, humidity
+    temperature = read_temp()
+    moisture = read_moisture()
+    if moisture is not None and temperature is not None:
+        return temperature, moisture
     else:
         print("Failed to retrieve data from sensor")
         return None, None
@@ -46,8 +48,31 @@ def read_temp():
         temp_string = lines[1][equals_pos+2:]
         temp_c = float(temp_string) / 1000.0
         temp_f = temp_c * 9.0 / 5.0 + 32.0
-        return temp_c, temp_f
+        return temp_f
 
+# Initialize SPI
+spi = spidev.SpiDev()
+spi.open(0, 0)  # SPI bus 0, device 0 (CE0)
+spi.max_speed_hz = 1350000  # Set SPI speed
+
+# Function to read analog data from MCP3008
+def read_analog(channel):
+    if channel < 0 or channel > 7:
+        raise ValueError("Channel must be between 0 and 7")
+    
+    # MCP3008 communication protocol
+    adc = spi.xfer2([1, (8 + channel) << 4, 0])
+    data = ((adc[1] & 3) << 8) + adc[2]
+    return data
+
+# Function to convert analog value to moisture percentage
+def analog_to_moisture(analog_value):
+    # ME110 typically outputs higher values for dry soil and lower values for wet soil
+    # Adjust these values based on your sensor's calibration
+    dry_value = 1023  # Value when sensor is in dry air
+    wet_value = 0     # Value when sensor is in water
+    moisture_percent = 100 - ((analog_value - wet_value) / (dry_value - wet_value)) * 100
+    return moisture_percent
 
 # Main loop
 while True:
@@ -55,13 +80,13 @@ while True:
     blynk.run()
 
     # Read sensor data
-    temperature, humidity = read_sensor_data()
+    temperature, moisture = read_sensor_data()
 
-    if temperature is not None and humidity is not None:
+    if temperature is not None and moisture is not None:
         # Send temperature to virtual pin V1
         blynk.virtual_write(1, temperature)
         # Send humidity to virtual pin V2
-        blynk.virtual_write(2, humidity)
+        blynk.virtual_write(2, moisture)
 
     # Wait for a few seconds before the next update
     time.sleep(5)
