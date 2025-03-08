@@ -94,7 +94,7 @@ def convert_to_vwc(voltage):
 # Main loop
 while True:
     # Run Blynk
-    blynk.run()
+   # blynk.run()
 
     # Read sensor data
     temperature, moisture = read_sensor_data()
@@ -103,9 +103,10 @@ while True:
 
     if temperature is not None and moisture is not None:
         # Send temperature to virtual pin V1
-        blynk.virtual_write(1, temperature)
+     #   blynk.virtual_write(1, temperature)
         # Send humidity to virtual pin V2
-        blynk.virtual_write(2, moisture)
+     #   blynk.virtual_write(2, moisture)
+        print("sending data")
 
     # Wait for a few seconds before the next update
     time.sleep(5)
