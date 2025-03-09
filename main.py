@@ -95,9 +95,9 @@ while True:
     print(f"Temperature:{temperature} \t Moisture:{moisture}")
 
     # Send temperature to virtual pin V0
-    send_to_blynk(0, temperature)
+    send_to_blynk("V0", temperature)
     # Send mositure to virtual pin V1
-    send_to_blynk(1, moisture)
+    send_to_blynk("V1", moisture)
 
     # Wait for a few seconds before the next update
     time.sleep(5)
