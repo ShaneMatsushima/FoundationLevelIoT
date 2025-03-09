@@ -12,10 +12,10 @@ base_dir = '/sys/bus/w1/devices/'
 device_folder = glob.glob(base_dir + '28*')[0]
 device_file = device_folder + '/w1_slave'
 
-#define BLYNK_TEMPLATE_ID "TMPL2mUZa-B08"
-#define BLYNK_TEMPLATE_NAME "IoT Monitoring"
-
-BLYNK_AUTH = "1HsbA7vb5uJ-u1WyQOVQDzr7szErpMcK"
+#define BLYNK_TEMPLATE_ID "TMPL2QxL2j53H"
+#define BLYNK_TEMPLATE_NAME "IFSIPS lv1"
+#define BLYNK_AUTH_TOKEN "tJeOuSoUZ9yQq4Jp4VpnSRhY6v2X7Drv"
+BLYNK_AUTH = "tJeOuSoUZ9yQq4Jp4VpnSRhY6v2X7Drv"
 
 # Initialize Blynk
 blynk = blynklib.Blynk(BLYNK_AUTH)
@@ -98,15 +98,12 @@ while True:
 
     # Read sensor data
     temperature, moisture = read_sensor_data()
-    print(f"Temperature{temperature} \t Moisture{moisture}")
+    print(f"Temperature:{temperature} \t Moisture:{moisture}")
 
-
-    if temperature is not None and moisture is not None:
-        # Send temperature to virtual pin V1
-     #   blynk.virtual_write(1, temperature)
-        # Send humidity to virtual pin V2
-     #   blynk.virtual_write(2, moisture)
-        print("sending data")
+    # Send temperature to virtual pin V1
+    blynk.virtual_write(0, temperature)
+    # Send humidity to virtual pin V2
+    blynk.virtual_write(1, moisture)
 
     # Wait for a few seconds before the next update
     time.sleep(5)
