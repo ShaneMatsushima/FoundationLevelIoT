@@ -1,7 +1,7 @@
 import time
 import Adafruit_ADS1x15
 
-# Create an ADS1115 instance
+# Create an ADS1115 instance test
 adc = Adafruit_ADS1x15.ADS1115(busnum=1)
 
 # Set the gain (adjust based on your sensor's output voltage range)
