@@ -1,8 +1,8 @@
-import blynklib
 import time
 import os
 import glob
 import Adafruit_ADS1x15
+from blynk_request import send_to_blynk
 
  
 os.system('modprobe w1-gpio')
@@ -11,14 +11,6 @@ os.system('modprobe w1-therm')
 base_dir = '/sys/bus/w1/devices/'
 device_folder = glob.glob(base_dir + '28*')[0]
 device_file = device_folder + '/w1_slave'
-
-#define BLYNK_TEMPLATE_ID "TMPL2QxL2j53H"
-#define BLYNK_TEMPLATE_NAME "IFSIPS lv1"
-#define BLYNK_AUTH_TOKEN "tJeOuSoUZ9yQq4Jp4VpnSRhY6v2X7Drv"
-BLYNK_AUTH = "tJeOuSoUZ9yQq4Jp4VpnSRhY6v2X7Drv"
-
-# Initialize Blynk
-blynk = blynklib.Blynk(BLYNK_AUTH)
 
 TEMPERATURE_PIN = 4  # GPIO pin connected to the DHT11 sensor
 # Create an ADS1115 instance
@@ -100,10 +92,10 @@ while True:
     temperature, moisture = read_sensor_data()
     print(f"Temperature:{temperature} \t Moisture:{moisture}")
 
-    # Send temperature to virtual pin V1
-    blynk.virtual_write(0, temperature)
-    # Send humidity to virtual pin V2
-    blynk.virtual_write(1, moisture)
+    # Send temperature to virtual pin V0
+    send_to_blynk(temperature, 0)
+    # Send mositure to virtual pin V1
+    send_to_blynk(moisture, 1)
 
     # Wait for a few seconds before the next update
     time.sleep(5)
