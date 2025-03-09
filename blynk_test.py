@@ -6,7 +6,7 @@ import time
 BLYNK_AUTH = 'tJeOuSoUZ9yQq4Jp4VpnSRhY6v2X7Drv'
 
 # Initialize Blynk
-blynk = blynklib.Blynk(BLYNK_AUTH)
+blynk = blynklib.Blynk(BLYNK_AUTH, server='45.55.96.146')
 
 # Function to send data to Blynk
 def send_data():
