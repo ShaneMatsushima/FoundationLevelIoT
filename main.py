@@ -2,7 +2,7 @@ import time
 import os
 import glob
 import Adafruit_ADS1x15
-from blynk_request import send_to_blynk
+from blynk_request.blynk_request import send_to_blynk
 
  
 os.system('modprobe w1-gpio')
