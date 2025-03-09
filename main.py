@@ -90,6 +90,8 @@ while True:
     temperature, moisture = read_sensor_data()
     temperature = f"{temperature:.2f}"
     moisture = f"{moisture:.2f}"
+    temperature = float(temperature)
+    moisture = float(moisture)
     print(f"Temperature:{temperature} \t Moisture:{moisture}")
 
     # Send temperature to virtual pin V0
