@@ -1,37 +1,33 @@
-from blynklib import Blynk
+import blynklib
+import random
 import time
 
-# Blynk Auth Token (replace with your token)
-BLYNK_AUTH_TOKEN = "1HsbA7vb5uJ-u1WyQOVQDzr7szErpMcK"
+# Replace with your Blynk.Console Auth Token
+BLYNK_AUTH = 'tJeOuSoUZ9yQq4Jp4VpnSRhY6v2X7Drv'
 
 # Initialize Blynk
-blynk = Blynk(BLYNK_AUTH_TOKEN)
-
-# Example variables to send to Blynk
-v1 = 25.5  # Example value 1
-v2 = 70.3  # Example value 2
+blynk = blynklib.Blynk(BLYNK_AUTH)
 
 # Function to send data to Blynk
-def send_data_to_blynk():
-    # Send v1 to virtual pin V1
-    blynk.virtual_write(1, v1)
-    # Send v2 to virtual pin V2
-    blynk.virtual_write(2, v2)
-    print(f"Sent to Blynk: V1 = {v1}, V2 = {v2}")
-
-# Main loop
-try:
+def send_data():
     while True:
-        # Run Blynk
-        blynk.run()
+        # Generate random data (replace this with your actual sensor data)
+        temperature = random.randint(20, 30)  # Example: temperature data
+        humidity = random.randint(40, 60)     # Example: humidity data
 
-        # Send data to Blynk every 5 seconds
-        send_data_to_blynk()
-        time.sleep(5)
+        # Send data to Virtual Pins
+        blynk.virtual_write(0, temperature)  # V0 for temperature
+        blynk.virtual_write(1, humidity)      # V1 for humidity
 
-        # Update v1 and v2 (for demonstration purposes)
-        v1 += 1
-        v2 -= 1
+        # Print the values to the console (for debugging)
+        print(f"Temperature: {temperature}°C, Humidity: {humidity}%")
 
-except KeyboardInterrupt:
-    print("Exiting...")
+        # Wait for 2 seconds before sending the next value
+        time.sleep(2)
+
+# Start the data sending loop
+if __name__ == "__main__":
+    try:
+        send_data()
+    except KeyboardInterrupt:
+        print("Program stopped.")
