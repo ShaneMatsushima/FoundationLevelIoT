@@ -20,3 +20,4 @@ def send_to_blynk(virtual_pin, value):
         print(f"Data sent to {virtual_pin}: {value}")
     else:
         print(f"Failed to send data to {virtual_pin}. Status code: {response.status_code}")
+        print(response.json())
