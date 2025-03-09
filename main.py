@@ -85,11 +85,11 @@ def convert_to_vwc(voltage):
 
 # Main loop
 while True:
-    # Run Blynk
-   # blynk.run()
 
     # Read sensor data
     temperature, moisture = read_sensor_data()
+    temperature = f"{temperature:.2f}"
+    moisture = f"{moisture:.2f}"
     print(f"Temperature:{temperature} \t Moisture:{moisture}")
 
     # Send temperature to virtual pin V0
