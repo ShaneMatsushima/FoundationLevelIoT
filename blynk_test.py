@@ -25,6 +25,10 @@ def send_data():
         # Wait for 2 seconds before sending the next value
         time.sleep(2)
 
+@blynk.handle_event("connect")
+def on_connect():
+    print("Connected to Blynk!")
+
 # Main loop
 if __name__ == "__main__":
     try:
