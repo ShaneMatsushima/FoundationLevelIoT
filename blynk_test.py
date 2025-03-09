@@ -25,9 +25,16 @@ def send_data():
         # Wait for 2 seconds before sending the next value
         time.sleep(2)
 
-# Start the data sending loop
+# Main loop
 if __name__ == "__main__":
     try:
-        send_data()
+        # Start the Blynk connection
+        while True:
+            try:
+                # Connect to Blynk
+                blynk.run()
+            except Exception as e:
+                print(f"Connection error: {e}. Retrying in 5 seconds...")
+                time.sleep(5)
     except KeyboardInterrupt:
         print("Program stopped.")
